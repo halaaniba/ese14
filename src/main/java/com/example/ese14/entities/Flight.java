@@ -18,7 +18,7 @@ public class Flight {
     @Column(nullable = false, name = "description")
     private String description;
     @Column(nullable = false, name = "from_airport")
-    private String fromAirpoirt;
+    private String fromAirport;
     @Column(nullable = false, name = "to_airport")
     private String toAirport;
 
