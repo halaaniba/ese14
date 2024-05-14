@@ -30,8 +30,8 @@ public class FlightController {
         return flightService.getAllFlights(page, size);
     }
 
-    @GetMapping("/ontimeFlights")
-    public List<Flight> getOntimeFlights() {
+    @GetMapping("/onTimeFlights")
+    public List<Flight> getOnTimeFlights() {
         return flightService.getOnTimeFlight();
     }
 
