@@ -4,6 +4,10 @@ import com.example.ese14.entities.Flight;
 import com.example.ese14.entities.FlightStatus;
 import com.example.ese14.repository.FlightRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,35 +19,33 @@ import java.util.stream.IntStream;
 public class FlightService {
 
     @Autowired
-    FlightRepository flightRepository;
+    private FlightRepository flightRepository;
 
-    public List<Flight> createFlights(int count) {
+    public void createFlight(int n) {
         Random random = new Random();
-        List<Flight> flights = IntStream.range(0, count)
+        List<Flight> flights = IntStream.range(0, n)
                 .mapToObj(i -> {
                     Flight flight = new Flight();
                     flight.setDescription("Flight " + i);
-                    flight.setFromAirpoirt(generateAirportCode());
-                    flight.setToAirport(generateAirportCode());
-                    flight.setStatus(FlightStatus.ON_TIME);
+                    flight.setFromAirport("Airport " + random.nextInt(49));
+                    flight.setToAirport("Airport " + random.nextInt(49));
+                    flight.setStatus(FlightStatus.values()[random.nextInt(FlightStatus.values().length)]);
                     return flight;
                 })
                 .collect(Collectors.toList());
-        return flightRepository.saveAll(flights);
+        flightRepository.saveAll(flights);
     }
 
-    public List<Flight> getAllFlights() {
-        return flightRepository.findAll();
+    public Page<Flight> getAllFlights(int page, int size) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("id").ascending());
+        return flightRepository.findAll(pageable);
     }
 
-    private String generateAirportCode() {
-        Random random = new Random();
-        String alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        StringBuilder stringBuilder = new StringBuilder();
-        for (int i = 0; i < 3; i++) {
-            stringBuilder.append(alphabet.charAt(random.nextInt(alphabet.length())));
-        }
-        return stringBuilder.toString();
+    public List<Flight> getOnTimeFlight() {
+        return flightRepository.findAllByStatus(FlightStatus.ON_TIME);
+    }
+
+    public List<Flight> getCustomQueryFlight(FlightStatus p1, FlightStatus p2) {
+        return flightRepository.findByStatus(List.of(p1, p2));
     }
 }
-
